@@ -1,4 +1,5 @@
 // lib/page/home/home.dart
+import 'package:eum/page/home/road_map/road_map.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/bottom_bar.dart';
@@ -27,7 +28,7 @@ class _HomePageState extends State<HomePage> {
     // 각 탭에 대응하는 화면들
     final List<Widget> pages = [
       const DashBoard(),
-      const Center(child: Text('로드맵 페이지')),      // 1: 로드맵 (TODO 교체)
+      const RoadMapPage(),      // 1: 로드맵 (TODO 교체)
       const Center(child: Text('AI 추천 페이지')),     // 2: AI 추천 (TODO 교체)
       const FindPolicyPage(),
       const Center(child: Text('캘린더 페이지')),      // 4: 캘린더 (TODO 교체)

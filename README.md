@@ -1,182 +1,358 @@
-# e:um - 청년과 정책을 잇다
+# e:um - 청년과 정책을 이어주는 AI 기반 맞춤형 청년정책 추천 및 로드맵 설계 서비스
 
-e:um은 대한민국 청년(20~30대)이 복잡하고 분산된 정부·지자체·기관의 청년 정책, 장학금, 복지 혜택을 한 곳에서 쉽게 찾고, AI가 개인 맞춤형으로 추천해 주는 Flutter 모바일 앱입니다. 정책 탐색, AI 추천, 로드맵 구성, 캘린더 알림까지 앱 내에서 연결합니다.
+e:um은 대한민국 청년(20~30대)들이 복잡하고 분산된 정부·지자체·기관의 청년 정책, 장학금, 복지 혜택 정보 등을 한 곳에서 쉽게 찾고, AI가 개인 맞춤형으로 추천해주는 서비스입니다. 정책 탐색부터 AI 추천, 로드맵 구성, 캘린더 알림까지 하나의 앱에서 통합 관리할 수 있습니다.
 
-
-## 주요 기능(현재/계획)
-- 정책 탐색: 카테고리/검색 기반 목록 및 상세 보기
-- AI 추천(계획): 사용자 프로필 기반 정책/로드맵 추천
-- 로드맵(계획): 단계별 수행 로드맵 생성/수정/진행률 관리
-- 캘린더·알림(부분 준비): 마감일/신청일 등록 및 로컬 알림
-- 인증(계획): 회원가입/로그인/토큰 캐싱
-
-
-## 기술 스택
-- Flutter 3.5+ / Dart 3.5+
-- 상태 관리: Provider/Riverpod 도입 예정(초기 버전은 MaterialApp + 간단 페이지)
-- 패키지(현재):
-  - intl, shared_preferences, flutter_local_notifications
-- 백엔드(연동 예정): Node.js 기반 API (정책/AI/로드맵/채팅/캘린더)
-
-
-## 프로젝트 구조(요약)
-Flutter 앱 기준의 정리된 3-Layer(또는 Clean Architecture) 지향 구조로 구성되어 있습니다.
+## 🏗️ 프로젝트 구조
 
 ```
-lib/
-  main.dart
-  core/                      # 공통/플랫폼 무관 유틸, 라우팅, 테마 등
-    config/
-      app_config.dart        # 환경 설정(예: API Base URL) - 필요 시 작성
-      api_endpoints.dart     # 백엔드 엔드포인트 경로 상수 - 필요 시 작성
-    constants/
-      app_constants.dart
-      string_constants.dart
-    error/
-      exceptions.dart
-      failures.dart
-    routes/
-      app_router.dart        # 전역 라우팅 설정(MaterialApp.router 등) - 필요 시 작성
-      route_paths.dart
-    theme/
-      app_colors.dart
-      app_text_styles.dart
-      app_theme.dart
-    utils/
-      validators.dart
-      date_formatters.dart
-      shared_preferences_manager.dart
-      notification_service.dart
-
-  data/                      # 외부/원천 데이터 접근 계층
-    datasources/
-      remote/                # 원격 API 호출
-        auth_remote_datasource.dart
-        policy_remote_datasource.dart
-        roadmap_remote_datasource.dart
-        ai_remote_datasource.dart
-        chat_remote_datasource.dart
-        calendar_remote_datasource.dart
-      local/
-        auth_local_datasource.dart
-        policy_cache_datasource.dart
-    models/                  # DTO/응답 매핑
-      auth/...               # login_request/response, user
-      policy/...             # policy, category, list response
-      roadmap/...            # roadmap, block
-      calendar/...           # event
-      chat/...               # message, session
-      common/api_response_model.dart
-    repositories/
-      auth_repository_impl.dart
-      policy_repository_impl.dart
-      roadmap_repository_impl.dart
-      ai_repository_impl.dart
-      chat_repository_impl.dart
-      calendar_repository_impl.dart
-
-  domain/                    # 비즈니스 규칙 계층
-    entities/                # 순수 Dart 엔터티
-      auth/...  policy/...  roadmap/...  calendar/...  chat/...
-    repositories/            # 리포지토리 계약(인터페이스)
-      auth_repository.dart
-      policy_repository.dart
-      roadmap_repository.dart
-      ai_repository.dart
-      chat_repository.dart
-      calendar_repository.dart
-    usecases/                # 유스케이스(인터랙터)
-      auth/...  policy/...  roadmap/...  ai_recommendation/...  chat/...  calendar/...
-
-  presentation/              # UI 레이어(계획). 현재는 간단한 Page/Widget 사용
-    providers/...            # 상태 관리(도입 예정)
-    screens/...              # Splash/Login/Dashboard/Policy/Roadmap/Calendar/AI/Chat
-    widgets/...              # 공통 위젯 모음
-
-  # 초기 버전에서 사용 중인 단순 경로(점진적으로 presentation/로 정리 예정)
-  page/                      # 예: home 등 일부 화면
-  widgets/                   # 예: policy_card 등 재사용 위젯
+e:um/
+├── mobile/                    # Flutter 모바일 앱
+│   ├── lib/
+│   │   ├── core/             # 공통 유틸, 라우팅, 테마
+│   │   │   ├── config/       # 환경 설정 (API Base URL 등)
+│   │   │   ├── constants/    # 상수 정의
+│   │   │   ├── error/        # 에러 처리
+│   │   │   ├── routes/       # 전역 라우팅
+│   │   │   ├── theme/        # 테마 및 스타일
+│   │   │   └── utils/        # 유틸리티 함수
+│   │   ├── data/             # 데이터 접근 계층
+│   │   │   ├── datasources/  # API 호출 및 로컬 캐시
+│   │   │   │   ├── remote/   # 원격 API
+│   │   │   │   └── local/    # 로컬 캐시
+│   │   │   ├── models/       # DTO/응답 매핑
+│   │   │   └── repositories/ # 리포지토리 구현
+│   │   ├── domain/           # 비즈니스 로직 계층
+│   │   │   ├── entities/     # 도메인 엔터티
+│   │   │   ├── repositories/ # 리포지토리 인터페이스
+│   │   │   └── usecases/     # 유스케이스
+│   │   └── presentation/     # UI 계층
+│   │       ├── providers/    # 상태 관리
+│   │       ├── screens/      # 화면 컴포넌트
+│   │       └── widgets/      # 재사용 위젯
+│   ├── ios/                  # iOS 프로젝트
+│   ├── android/              # Android 프로젝트
+│   ├── pubspec.yaml          # Flutter 의존성
+│   └── analysis_options.yaml # 코드 분석 규칙
+│
+└── api/                      # Node.js 백엔드 서버
+    ├── src/
+    │   ├── routes/           # API 라우트
+    │   │   ├── auth/         # 인증 관련
+    │   │   ├── policy/       # 정책 관련
+    │   │   ├── roadmap/      # 로드맵 관련
+    │   │   ├── ai/           # AI 추천
+    │   │   ├── chat/         # 챗봇
+    │   │   └── calendar/     # 캘린더
+    │   ├── controllers/      # 컨트롤러
+    │   ├── services/         # 비즈니스 로직
+    │   ├── models/           # 데이터 모델
+    │   ├── middleware/       # 미들웨어
+    │   └── utils/            # 유틸리티
+    ├── config/               # 설정 파일
+    ├── server.js             # 서버 진입점
+    ├── package.json          # Node.js 의존성
+    └── .env.example          # 환경 변수 예시
 ```
 
-참고: 실제 파일 유무/이름은 진행 상황에 따라 일부 다를 수 있습니다. 위 구조는 목표 구조이며, 현재는 최소 화면으로 앱을 시동합니다.
+## 🚀 실행 방법
 
+### 1. 백엔드 API 서버 실행
 
-## 실행 방법
-사전 준비: Flutter 설치 및 iOS/Android/macOS 개발 환경을 갖춥니다.
+#### 로컬 환경에서 실행
 
-1) 의존성 설치
+1. **Node.js 의존성 설치**
+```bash
+cd api
+npm install
 ```
+
+2. **환경 변수 설정**
+```bash
+cp .env.example .env
+# .env 파일을 열어 필요한 환경 변수 설정
+```
+
+3. **서버 실행**
+```bash
+# 개발 모드
+npm run dev
+
+# 프로덕션 모드
+npm start
+```
+
+서버가 `http://localhost:3000`에서 실행됩니다.
+
+#### Docker로 실행
+
+```bash
+cd api
+docker-compose up -d
+```
+
+### 2. Flutter 모바일 앱 실행
+
+#### 사전 준비
+- Flutter SDK 3.5+ 설치
+- Dart SDK 3.5+ 설치
+- iOS/Android 개발 환경 설정
+
+#### 로컬 환경에서 실행
+
+1. **Flutter 의존성 설치**
+```bash
+cd mobile
 flutter pub get
 ```
 
-2) iOS (시뮬레이터)
-```
-open ios/Runner.xcworkspace
-# Xcode에서 Signing 설정 후
+2. **iOS 실행 (macOS 필요)**
+```bash
+cd ios
+pod install
+cd ..
 flutter run -d ios
 ```
 
-3) Android (에뮬레이터/디바이스)
-```
+3. **Android 실행**
+```bash
 flutter run -d android
 ```
 
-4) macOS (옵션)
-```
+4. **macOS 실행 (옵션)**
+```bash
 flutter config --enable-macos-desktop
 flutter run -d macos
 ```
 
-문제 발생 시 아래 트러블슈팅을 참고하세요.
+#### 프로덕션 빌드
 
+```bash
+# Android APK
+flutter build apk --release
 
-## 환경설정(AppConfig)과 API 엔드포인트
-백엔드 연동을 시작하기 전 아래처럼 환경 변수를 정의하는 것을 권장합니다.
-- `lib/core/config/app_config.dart`: 환경별 설정(예: baseUrl)
-- `lib/core/config/api_endpoints.dart`: 정책/로드맵/AI/채팅/캘린더 등 엔드포인트 경로 상수
+# iOS IPA (macOS 필요)
+flutter build ios --release
 
-예시(가이드):
-- AppConfig에 `const String baseUrl = "http://localhost:3000";`와 같은 값을 둡니다.
-- api_endpoints.dart에 `/policies`, `/roadmaps`, `/chat`, `/calendar` 등의 경로 상수를 정의합니다.
+# Android App Bundle
+flutter build appbundle --release
+```
 
-초기 버전은 더미 데이터/로컬 캐시로 동작할 수 있으며, 실제 API 연동 시 http/dio 등 클라이언트를 추가하세요.
+#### 개발 도구
 
+```bash
+# 코드 분석
+flutter analyze
 
-## 라우팅(AppRouter) 가이드
-- 단일 화면으로 시작할 땐 `MaterialApp(home: ...)` 으로 충분합니다.
-- 화면이 늘어나면 `MaterialApp.router` + `AppRouter`(go_router/auto_route 등)로 전환해,
-  `lib/core/routes/app_router.dart`에서 라우팅 테이블을 관리하세요.
-- `route_paths.dart`에는 경로 상수를 모아두면 유지보수에 유리합니다.
+# 테스트 실행
+flutter test
 
-현재 버전은 최소 화면으로 시동되며, 라우팅 확장은 추후 단계에서 적용됩니다.
+# 캐시 정리
+flutter clean && flutter pub get
+```
 
+## 📋 API 스펙
 
-## 개발 가이드
-- 코딩 규칙: `analysis_options.yaml` 기반 lints 준수
-- 레이어드 아키텍처: core/data/domain/presentation 간 의존 방향 유지
-  - presentation -> domain(usecases) -> repositories(interface) -> data(impl)
-- 모델/엔터티 분리: API 응답(DTO)와 도메인 엔터티를 구분
-- 상태 관리: Provider/Riverpod를 screens/providers에 배치 예정
-- 알림: `flutter_local_notifications` 초기화는 앱 시작 시 1회 수행
+### 주요 엔드포인트
 
+#### 인증
+- `POST /api/auth/register` - 회원가입
+- `POST /api/auth/login` - 로그인
+- `POST /api/auth/logout` - 로그아웃
+- `GET /api/auth/profile` - 프로필 조회
 
-## 자주 겪는 이슈와 해결법
-- iOS Pod 관련 오류
-  - `cd ios && pod install && cd ..`
-  - Xcode에서 Signing Team 설정 확인
-- 로컬 알림 권한/초기화 문제
-  - iOS: 알림 권한 요청 필요, Android: 채널 생성 확인
-- 패키지 의존성 충돌
-  - `flutter clean && flutter pub get`
-- 빌드/런 버튼 옆 X 마크(분석 경고)
-  - main.dart의 import 경로/미사용 import 확인
-  - 존재하지 않는 파일 참조 제거 또는 해당 파일 생성
+#### 정책
+- `GET /api/policies` - 정책 목록 조회
+- `GET /api/policies/:id` - 정책 상세 조회
+- `GET /api/policies/categories` - 카테고리 목록
+- `GET /api/policies/search` - 정책 검색
 
+#### AI 추천
+- `POST /api/ai/recommend` - 맞춤형 정책 추천
+- `POST /api/ai/chat` - AI 챗봇 대화
 
-## 빠른 확인(스모크 테스트)
-- 앱이 정상 시동되는지 확인하고, 홈 화면에서 기본 버튼/네비게이션이 동작하는지 체크합니다.
-- 추가 기능(정책 목록/상세, AI 추천 등)은 모듈 단위로 점진 구현합니다.
+#### 로드맵
+- `GET /api/roadmaps` - 로드맵 목록
+- `GET /api/roadmaps/:id` - 로드맵 상세
+- `POST /api/roadmaps` - 로드맵 생성
+- `PUT /api/roadmaps/:id` - 로드맵 수정
+- `DELETE /api/roadmaps/:id` - 로드맵 삭제
 
+#### 캘린더
+- `GET /api/calendar/events` - 일정 목록
+- `POST /api/calendar/events` - 일정 추가
+- `PUT /api/calendar/events/:id` - 일정 수정
+- `DELETE /api/calendar/events/:id` - 일정 삭제
 
-## 라이선스
-본 저장소는 해커톤/프로토타입 용도로 시작되었으며, 별도 고지 전까지는 내부 사용을 전제로 합니다.
+### 기술 스택
+
+#### 모바일 앱 (Flutter)
+- **Framework**: Flutter 3.5+
+- **언어**: Dart 3.5+
+- **상태 관리**: Provider / Riverpod (도입 예정)
+- **아키텍처**: Clean Architecture (3-Layer)
+- **주요 패키지**:
+  - `http` / `dio`: API 통신
+  - `shared_preferences`: 로컬 저장소
+  - `flutter_local_notifications`: 알림
+  - `intl`: 국제화 및 날짜 포맷
+  - `provider`: 상태 관리 (예정)
+- **플랫폼**: iOS, Android, macOS (옵션)
+
+#### 백엔드 (API)
+- **Framework**: Node.js + Express.js
+- **언어**: JavaScript / TypeScript
+- **데이터베이스**: PostgreSQL / MongoDB
+- **AI/ML**: 
+  - OpenAI API
+  - LangChain (예정)
+- **인증**: JWT
+- **ORM**: Sequelize / Prisma
+- **패키지 관리**: npm
+
+## 🔧 주요 기능
+
+### 1. 정책 탐색 및 검색
+- **카테고리별 탐색**: 취업, 창업, 주거, 복지, 교육 등 카테고리별 정책 분류
+- **검색 기능**: 키워드 기반 정책 검색
+- **상세 정보**: 신청 자격, 혜택, 신청 방법, 마감일 등 상세 정보 제공
+- **즐겨찾기**: 관심 정책 저장 및 관리
+
+### 2. AI 맞춤형 추천
+- **프로필 기반 추천**: 나이, 지역, 관심사, 상황 등을 고려한 개인화 추천
+- **AI 챗봇**: 자연어 대화를 통한 정책 상담 및 안내
+- **실시간 업데이트**: 새로운 정책 알림 및 추천
+
+### 3. 로드맵 설계 및 관리
+- **단계별 로드맵**: 목표 달성을 위한 단계별 정책 활용 계획
+- **진행률 추적**: 각 단계별 완료 상태 관리
+- **맞춤형 생성**: AI 기반 자동 로드맵 생성
+- **수정 및 공유**: 로드맵 편집 및 다른 사용자와 공유
+
+### 4. 캘린더 및 알림
+- **마감일 관리**: 정책 신청 마감일 자동 등록
+- **로컬 알림**: 중요 일정 푸시 알림
+- **일정 동기화**: 캘린더 통합 관리
+
+### 5. 사용자 인증 및 프로필
+- **회원가입/로그인**: 이메일 및 소셜 로그인 (예정)
+- **프로필 관리**: 개인 정보 및 관심사 설정
+- **토큰 관리**: JWT 기반 보안 인증
+
+## 📝 개발 가이드
+
+### Flutter 앱 개발
+
+1. **Clean Architecture 준수**
+   - `presentation` → `domain` → `data` 의존성 방향 유지
+   - UI는 UseCase만 호출, Repository 직접 접근 금지
+   - 모델(DTO)과 엔터티 분리
+
+2. **상태 관리**
+   - Provider/Riverpod 사용 예정
+   - `presentation/providers/`에 상태 관리 로직 배치
+
+3. **코딩 규칙**
+   - `analysis_options.yaml` 기반 lints 준수
+   - Flutter 공식 스타일 가이드 따르기
+   - 의미 있는 변수명 및 함수명 사용
+
+4. **에러 핸들링**
+   - `core/error/`의 Exception과 Failure 활용
+   - 사용자 친화적인 에러 메시지 표시
+
+5. **테스트 작성**
+   - Unit Test: 비즈니스 로직
+   - Widget Test: UI 컴포넌트
+   - Integration Test: 전체 흐름
+
+### 백엔드 API 개발
+
+1. **RESTful API 설계**
+   - 명확한 엔드포인트 네이밍
+   - HTTP 메서드 적절히 사용 (GET, POST, PUT, DELETE)
+   - 상태 코드 정확히 반환
+
+2. **데이터베이스 설계**
+   - 정규화된 테이블 구조
+   - 인덱스 최적화
+   - 마이그레이션 관리
+
+3. **보안**
+   - JWT 토큰 검증
+   - 입력값 검증 및 sanitization
+   - CORS 설정
+   - Rate limiting
+
+4. **AI 통합**
+   - OpenAI API 연동
+   - 프롬프트 엔지니어링
+   - 응답 캐싱 및 최적화
+
+## 🐛 트러블슈팅
+
+### Flutter 관련
+
+**iOS Pod 관련 오류**
+```bash
+cd ios
+pod deintegrate
+pod install
+cd ..
+```
+
+**빌드 오류 발생 시**
+```bash
+flutter clean
+flutter pub get
+flutter pub upgrade
+```
+
+**Android 빌드 문제**
+- `android/app/build.gradle`에서 minSdkVersion 확인
+- Android Studio에서 Gradle 동기화
+
+**로컬 알림이 작동하지 않을 때**
+- iOS: Info.plist에 권한 설정 확인
+- Android: AndroidManifest.xml 및 채널 생성 확인
+
+### 백엔드 관련
+
+**서버 시작 오류**
+```bash
+# 포트 충돌 확인
+lsof -i :3000
+
+# 노드 모듈 재설치
+rm -rf node_modules
+npm install
+```
+
+**데이터베이스 연결 실패**
+- `.env` 파일의 데이터베이스 설정 확인
+- 데이터베이스 서버 실행 상태 확인
+
+**API 응답 지연**
+- 쿼리 최적화
+- 캐싱 전략 검토
+- API 호출 횟수 제한
+
+## 📚 참고 자료
+
+- [Flutter 공식 문서](https://flutter.dev/docs)
+- [Dart 공식 문서](https://dart.dev/guides)
+- [Clean Architecture in Flutter](https://resocoder.com/flutter-clean-architecture-tdd/)
+- [Provider 패키지](https://pub.dev/packages/provider)
+- [Node.js 공식 문서](https://nodejs.org/docs)
+- [Express.js 가이드](https://expressjs.com/guide)
+
+## 📄 라이선스
+
+본 프로젝트는 해커톤/프로토타입 용도로 시작되었으며, 별도 고지 전까지는 내부 사용을 전제로 합니다.
+
+## 👥 팀 정보
+
+e:um은 청년들의 더 나은 미래를 위해 노력하는 팀입니다.
+
+---
+
+**Made with ❤️ by e:um Team**

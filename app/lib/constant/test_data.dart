@@ -1,3 +1,4 @@
+import '../model/chat_message.dart';
 import '../model/policy_data.dart';
 
 final String testUserName = "김남훈";
@@ -45,5 +46,14 @@ final testPolicies = [
     description: "대학생 등록금 부담 완화를 위한 소득 연계 맞춤형 장학금",
     summary: "",
     matchRate: 95,
+  ),
+];
+
+final testMessages = [
+  ChatMessage(
+    sender: Sender.bot,
+    text:
+    '안녕하세요! 청년 정책 추천 AI 챗봇 이음입니다. 필요하신 정책에 대해 자유롭게 질문해 주세요!\n\nex. 이번달 내가 신청 가능한 주거 지원 정책이 있을까?\n\nex. 중복 수혜가 가능한 장학금 정책 알려줘!',
+    time: '21:15',
   ),
 ];

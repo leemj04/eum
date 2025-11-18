@@ -1,6 +1,8 @@
 // lib/widgets/bottom_bar.dart
 import 'package:flutter/material.dart';
 
+import '../page/chat/chat.dart';
+
 class _NavItem extends StatelessWidget {
   final int index;
   final int currentIndex;
@@ -131,7 +133,14 @@ class BottomBar extends StatelessWidget {
             onTap: onTap,
           ),
           _AiCenterItem(
-            onTap: () => onTap(2),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AiChatPage(),
+                ),
+              );
+            },
           ),
           _NavItem(
             index: 3,

@@ -1,8 +1,10 @@
 import 'package:eum/page/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
 
   runApp(const MyApp());
@@ -16,6 +18,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '청년정책 로드맵',
       theme: ThemeData.light(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       supportedLocales: const [
         Locale('ko', 'KR'),
       ],

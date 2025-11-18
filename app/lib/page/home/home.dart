@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            const TopBar(),        // 🔥 항상 고정되는 상단바
+            const TopBar(),
             const SizedBox(height: 12),
 
             Expanded(

@@ -1,50 +1,47 @@
-// lib/widgets/policy_card.dart
 import 'package:flutter/material.dart';
-
-class PolicyViewData {
-  final String title;
-  final String category;
-  final String deadline;
-  final String description;
-  final int matchRate;
-  final bool isUrgent;
-
-  PolicyViewData({
-    required this.title,
-    required this.category,
-    required this.deadline,
-    required this.description,
-    required this.matchRate,
-    this.isUrgent = false,
-  });
-}
+import '../model/policy_data.dart';
 
 class PolicyCard extends StatelessWidget {
   final PolicyViewData policy;
+  final VoidCallback? onTap;
 
-  const PolicyCard({super.key, required this.policy});
+  const PolicyCard({
+    super.key,
+    required this.policy,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-            color: Colors.black.withOpacity(0.03),
+    final borderRadius = BorderRadius.circular(14);
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: borderRadius,
+      child: InkWell(
+        onTap: onTap,                 // 👈 여기서 탭 이벤트 처리
+        borderRadius: borderRadius,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: borderRadius,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+                color: Colors.black.withOpacity(0.03),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(child: _PolicyMain(policy: policy)),
-          const SizedBox(width: 8),
-          _PolicySide(matchRate: policy.matchRate),
-        ],
+          child: Row(
+            children: [
+              Expanded(child: _PolicyMain(policy: policy)),
+              const SizedBox(width: 8),
+              _PolicySide(matchRate: policy.matchRate),
+            ],
+          ),
+        ),
       ),
     );
   }

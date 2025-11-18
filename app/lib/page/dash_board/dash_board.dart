@@ -1,11 +1,12 @@
-// lib/ui/ai_recommend_screen.dart
 import 'package:eum/constant/test_data.dart';
+import 'package:eum/page/dash_board/policy_popup/policy_popup.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/bottom_bar.dart';
 import '../../widgets/greeting_card.dart';
 import '../../widgets/policy_card.dart';
 import '../../widgets/section_header.dart';
+import '../../widgets/top_bar.dart';
 
 /// AI 추천 탭의 전체 화면 레이아웃만 담당하는 위젯
 class DashBoard extends StatelessWidget {
@@ -21,7 +22,7 @@ class DashBoard extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const _TopAppBar(),
+            const TopBar(),
             Expanded(
               child: SingleChildScrollView(
                 padding:
@@ -39,8 +40,23 @@ class DashBoard extends StatelessWidget {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) =>
-                          PolicyCard(policy: testPolicies[index]),
+                      itemBuilder: (context, index) {
+                        final policy = testPolicies[index];
+                        return PolicyCard(
+                          policy: policy,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (_) => PolicyDetailDialog(
+                                title: policy.title,     // 너의 모델에 맞게 값 전달
+                                deadline: policy.deadline,
+                                summary: policy.summary,
+                              ),
+                            );
+                          },
+                        );
+                      },
                       separatorBuilder: (_, __) =>
                       const SizedBox(height: 10),
                       itemCount: testPolicies.length,
@@ -106,50 +122,6 @@ class _TopAppBar extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// 하단 네비게이션바
-class _BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-
-  const _BottomNavBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: const Color(0xFF4C6FFF),
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: '대시보드',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.route_outlined),
-          label: '로드맵',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.smart_toy_outlined),
-          label: 'AI 추천',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.list_alt_outlined),
-          label: '정책 탐색',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today_outlined),
-          label: '캘린더',
-        ),
-      ],
     );
   }
 }

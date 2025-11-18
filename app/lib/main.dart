@@ -1,8 +1,10 @@
 import 'package:eum/page/home/home.dart';
-import 'package:eum/widgets/policy_card.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+Future<void> main() async {
+  await initializeDateFormatting('ko_KR', null);
+
   runApp(const MyApp());
 }
 
@@ -14,6 +16,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '청년정책 로드맵',
       theme: ThemeData.light(),
+      supportedLocales: const [
+        Locale('ko', 'KR'),
+      ],
       home: HomePage()
     );
   }

@@ -1,4 +1,4 @@
-import 'package:eum/page/dash_board/dash_board.dart';
+import 'package:eum/page/home/home.dart';
 import 'package:eum/widgets/policy_card.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '청년정책 로드맵',
       theme: ThemeData.light(),
-      home: DashBoard()
+      home: HomePage()
     );
   }
 }
